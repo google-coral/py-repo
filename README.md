@@ -21,8 +21,8 @@ pip3 install --extra-index-url https://google-coral.github.io/py-repo/ tflite-ru
 
 ## Rebuild the index
 
-The following command rebuilds the pip index using the specified release branch and package versions:
+The following command rebuilds the pip index:
 
 ```shell
-python3 generate_repo.py --base_url=https://github.com/google-coral/pycoral/releases/download/release-frogfish pycoral@1.0.0 tflite-runtime@2.5.0
+python3 generate_repo.py
 ```
