@@ -17,8 +17,13 @@ import collections
 import hashlib
 import json
 import os
+import re
 import sys
 import urllib.request
+
+
+def normalize(name):
+  return re.sub(r'[-_.]+', '-', name).lower()
 
 
 def write(directory, filename, data):
@@ -37,7 +42,7 @@ def url_sha256(url):
 
 def repo_index_html(all_wheels):
   content = '\n      '.join(
-      f'<li><a href="{name}">{name}</a></li>' for name in all_wheels.keys())
+      f'<li><a href="{name}/">{name}</a></li>' for name in all_wheels.keys())
   return f"""<!DOCTYPE html>
 <html>
   <head><title>Coral PEP-503 Repository</title></head>
@@ -93,7 +98,7 @@ def generate_repo(output_dir, all_wheels):
           project_index_html(name, wheels))
 
 
-def get_all_wheels(github_owner, github_repo):
+def get_all_wheels(github_owner, github_repo, keyword):
   # https://docs.github.com/en/rest/reference/repos#releases
   url = f'https://api.github.com/repos/{github_owner}/{github_repo}/releases'
   all_wheels = collections.defaultdict(list)
@@ -105,8 +110,8 @@ def get_all_wheels(github_owner, github_repo):
       for asset in release['assets']:
         name = asset['name']
         url = asset['browser_download_url']
-        if name.endswith('.whl'):
-          project = name.split('-')[0]
+        if name.endswith('.whl') and keyword in name:
+          project = normalize(name.split('-')[0])
           all_wheels[project].append((name, url))
 
   for _, wheels in all_wheels.items():
@@ -119,6 +124,8 @@ def main():
   parser = argparse.ArgumentParser(description='PEP 503 repo generator.')
   parser.add_argument('--output_dir', default='out',
                       help='output directory to save repo content')
+  parser.add_argument('--keyword', default='',
+                      help='keyword to filter .whl files')
   parser.add_argument('--github_owner', default='google-coral',
                       help='GitHub repo owner')
   parser.add_argument('--github_repo', default='pycoral',
@@ -130,7 +137,8 @@ def main():
     print('Output directory "%s" already exists.' % output_dir, file=sys.stderr)
     return 1
 
-  generate_repo(output_dir, get_all_wheels(args.github_owner, args.github_repo))
+  all_wheels = get_all_wheels(args.github_owner, args.github_repo, args.keyword)
+  generate_repo(output_dir, all_wheels)
   return 0
 
 if __name__ == '__main__':
