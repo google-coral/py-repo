@@ -11,12 +11,12 @@ For example, `sudo apt-get install python3-pycoral`. (These Python wheels are pr
 
 Install `pycoral` library:
 ```shell
-python3 -m pip install --index-url https://google-coral.github.io/py-repo/ --extra-index-url=https://pypi.python.org/simple pycoral
+python3 -m pip install --extra-index-url https://google-coral.github.io/py-repo/ pycoral
 ```
 
 Install `tflite-runtime` library:
 ```shell
-python3 -m pip install --index-url https://google-coral.github.io/py-repo/ --extra-index-url=https://pypi.python.org/simple tflite-runtime
+python3 -m pip install --extra-index-url https://google-coral.github.io/py-repo/ tflite-runtime
 ```
 
 ## Rebuild the index
